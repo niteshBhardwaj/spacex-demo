@@ -1,12 +1,12 @@
 import { useQuery } from "@apollo/client";
-import { Grid } from "@material-ui/core";
+import { Box, Grid } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import LaunchCard from "./LaunchCard";
 import { Launch, LaunchesData, LaunchesPast } from "./Launches.interface";
 import { LAUNCHES_QUERY } from "./Launches.query";
 import LaunchFilterBar, { FilterKeys } from "./LaunchFIlterBar.view";
 import LaunchInfiniteScroll from "./LaunchInfiniteScroll.view";
-import { LaunchContext } from "./Launch.context";
+import { LaunchContext, LaunchVariables } from "./Launch.context";
 import { useRef } from "react";
 
 interface VariablesProps {
@@ -15,7 +15,7 @@ interface VariablesProps {
 }
 const Launches = (): JSX.Element => {
   const [variables, setVariables] = useState<VariablesProps>({ limit: 5 });
-  const timer = useRef<any>(); 
+  const timer = useRef<ReturnType<typeof setInterval>>(); 
   const { data, loading, error, fetchMore, refetch } = useQuery(
     LAUNCHES_QUERY,
     {
@@ -31,12 +31,12 @@ const Launches = (): JSX.Element => {
     })) as LaunchesData;
     if (!data?.launchesPast?.length) setNextPage(false);
   };
-  const refetchData = (data: any): void => {
+  const refetchData = (data: LaunchVariables): void => {
       if(data.find) setVariables({ ...variables, ...data });
   };
   useEffect(() => {
     if(variables.find) {
-        clearTimeout(timer.current);
+        timer.current && clearTimeout(timer.current);
         // delay refetch;
         timer.current = setTimeout(() => {
             refetch();
@@ -44,9 +44,9 @@ const Launches = (): JSX.Element => {
         }, 300);
     }
     return () => {
-        clearTimeout(timer.current);
+        timer.current && clearTimeout(timer.current);
     }
-  }, [variables]);
+  }, [variables, refetch, setNextPage]);
   return (
     <LaunchContext.Provider value={{ refetchData }}>
       <Grid container direction="column" alignItems="center">
@@ -65,7 +65,8 @@ const Launches = (): JSX.Element => {
           error={error}
           loadMore={loadNextData}
           hasNextPage={hasNextPage}
-        />
+          />
+          {!launchesPast?.length && !loading && <Box p={2}> No result found.</Box>}
       </Grid>
     </LaunchContext.Provider>
   );

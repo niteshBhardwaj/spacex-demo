@@ -1,9 +1,6 @@
 import { createContext } from "react";
-import { FilterKeys } from "./LaunchFIlterBar.view";
 
-export type LaunchVariables = {
-    find: FilterKeys
-}
+export type LaunchVariables = Record<string, string | any >
 interface ContextProps {
     refetchData?: (data: LaunchVariables) => void;
 }

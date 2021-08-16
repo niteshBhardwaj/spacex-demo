@@ -1,7 +1,7 @@
 import { ApolloError } from "@apollo/client";
 import { CircularProgress } from "@material-ui/core";
 import useInfiniteScroll from "react-infinite-scroll-hook";
-interface LaunchInfiniteScroll {
+interface LaunchInfiniteScrollProps {
   loadMore: () => void;
   loading: boolean;
   hasNextPage: boolean;
@@ -13,7 +13,7 @@ const LaunchInfiniteScroll = ({
   loading,
   hasNextPage,
   error,
-}: LaunchInfiniteScroll): JSX.Element => {
+}: LaunchInfiniteScrollProps): JSX.Element => {
   const [sentryRef] = useInfiniteScroll({
     loading,
     hasNextPage,
